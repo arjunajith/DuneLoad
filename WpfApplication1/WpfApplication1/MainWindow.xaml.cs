@@ -20,62 +20,14 @@ using System.IO;
 
 namespace WpfApplication1
 {
+
+
+		
+
     public partial class MainWindow
     {
        // public WebClient client1;
-        FileDownload down1;
-
-        public MainWindow()
-        {
-            InitializeComponent();
-            //client1 = new WebClient();
-            
-        }
-
-        private void onclick(object sender, RoutedEventArgs e)
-        {
-            Uri url1 = new Uri(URL.Text);
-            string fileName = Locat.Text + System.IO.Path.GetFileName(url1.LocalPath);
-            down1 = new FileDownload(URL.Text, fileName, 100);
-            
-            abc.Text = down1.GetContentLength().ToString();
-
-            //DownloadFileAsync method.
-            //client1.DownloadFileCompleted += (sender2, e2) =>
-            //    {
-            //        if (e2.Cancelled)
-            //        {
-            //            progbar.Value = 0;
-            //            abc.Text = "Download Aborted by User";
-            //        }
-            //        else
-            //            abc.Text = "Download Complete!";
-            //    };
-            //client1.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback); 
-            //client1.DownloadFileAsync(url1 , fileName);
-
-        }
-        //public void DownloadCompleteCallBack(object sender, DownloadDataCompletedEventArgs e)
-        //{ }
-        //public void DownloadProgressCallback(object sender, DownloadProgressChangedEventArgs e)
-        //{
-        //   // textb_temp.Text = e.ProgressPercentage.ToString();
-        //    progbar.Minimum = 0;
-        //    progbar.Maximum = 100;
-        //    progbar.Value = e.ProgressPercentage;
-        //}
-
-        private void canc(object sender, RoutedEventArgs e)
-        {
-            down1.Stop();
-            //client1.CancelAsync();
-        }
-
-    }
-
-    public class FileDownload
-    {
-        private volatile bool _allowedToRun;
+        private bool _allowedToRun;
         private volatile bool _notstop;
         private string _source;
         private string _destination;
@@ -84,24 +36,63 @@ namespace WpfApplication1
         public int BytesWritten { get; private set; }
         public int ContentLength { get { return _contentLength.Value; } }
         public bool Done { get { return ContentLength == BytesWritten; } }
-        public FileDownload(string source, string destination, int chunkSize)
+        private bool pausecheck;
+        public double percl,perc;
+
+        public MainWindow()
         {
-            _allowedToRun = true;
+            InitializeComponent();
+			_allowedToRun = true;
             _notstop = true;
-            _source = source;
-            _destination = destination;
-            _chunkSize = chunkSize;
+            _source = "";
+            _destination = "";
+            _chunkSize = 5120;
             _contentLength = new Lazy<int>(() => Convert.ToInt32(GetContentLength()));
             BytesWritten = 0;
+            pausecheck = false;
+            percl = 0;
+            perc = 0;
+            //client1 = new WebClient();
+            
         }
-        public long GetContentLength()
+
+        private void onclick(object sender, RoutedEventArgs e)
+        {
+            abc.Text = "";
+            Uri url1 = new Uri(URL.Text);
+            string fileName = Locat.Text + System.IO.Path.GetFileName(url1.LocalPath);
+			_source = URL.Text;
+			_destination = fileName;
+            percl = GetContentLength();
+            if (!File.Exists(_destination))
+            {
+                Start();
+            }
+            else
+            {
+                abc.Text = "File already exists";
+            }
+            if (Done)
+            {
+                abc.Text = "Download Complete";
+            }
+        }
+		
+        private void canc(object sender, RoutedEventArgs e)
+        {
+            Stop();
+            //client1.CancelAsync();
+        }
+		
+		public long GetContentLength()
         {
             var request = (HttpWebRequest)WebRequest.Create(_source);
             request.Method = "HEAD";
             using (var response = request.GetResponse())
                 return response.ContentLength;
         }
-        private async Task Start(int range)
+		
+		private async Task Start(int range)
         {
             if (!_allowedToRun)
                 throw new InvalidOperationException();
@@ -122,8 +113,24 @@ namespace WpfApplication1
                             if (bytesRead == 0) break;
                             await fs.WriteAsync(buffer, 0, bytesRead);
                             BytesWritten += bytesRead;
+                            if (!pausecheck)
+                            {
+                                abc.Text = BytesWritten.ToString();
+                                perc = (BytesWritten/percl) * 100;
+                                tb2.Text = perc.ToString().Substring(0,4) + " %";
+                                progbar.Value = perc;
+                            }
                             if (!_notstop)
                             {
+                                URL.Text = "Enter URL Here";
+                                progbar.Value = 0;
+                                abc.Text = "";
+                                tb2.Text = "";
+                                BytesWritten = 0;
+                                _notstop = true;
+                                _source = "";
+                                _allowedToRun = true;
+                                fs.Close();
                                 break;
                             }
                         }
@@ -132,20 +139,49 @@ namespace WpfApplication1
                     }
                 }
             }
+            if (Done)
+            {
+                abc.Text = "Download Complete";
+            }
+            else if (!_notstop)
+            {
+                File.Delete(_destination);
+                _notstop = true;
+
+            }
         }
-        public void Stop()
+		
+		public void Stop()
         {
             _notstop = false;
         }
-        public Task Start()
+        private Task Start()
         {
             _allowedToRun = true;
             return Start(BytesWritten);
         }
-        public void Pause()
+        public void Pause1()
         {
             _allowedToRun = false;
         }
-    }
 
+        private void Pause2(object sender, RoutedEventArgs e)
+        {
+            if (!pausecheck)
+            {
+                Pause1();
+                pausecheck = true;
+                abc.Text = "Download Paused";
+            }
+            else
+            {
+                Start();
+                pausecheck = false;
+                abc.Text = "Resuming";
+
+            }
+        }
+
+
+    }
 }
