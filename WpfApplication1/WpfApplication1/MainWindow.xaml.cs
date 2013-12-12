@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Net;
 using System.ComponentModel;
 using System.IO;
+using Duneload;
 
 
 namespace WpfApplication1
@@ -26,7 +27,6 @@ namespace WpfApplication1
 
     public partial class MainWindow
     {
-       // public WebClient client1;
         private bool _allowedToRun;
         private volatile bool _notstop;
         private string _source;
@@ -38,6 +38,8 @@ namespace WpfApplication1
         public bool Done { get { return ContentLength == BytesWritten; } }
         private bool pausecheck;
         public double percl,perc;
+        Uri url1;
+        string fileName;
 
         public MainWindow()
         {
@@ -52,15 +54,24 @@ namespace WpfApplication1
             pausecheck = false;
             percl = 0;
             perc = 0;
-            //client1 = new WebClient();
             
         }
 
         private void onclick(object sender, RoutedEventArgs e)
         {
             abc.Text = "";
-            Uri url1 = new Uri(URL.Text);
-            string fileName = Locat.Text + System.IO.Path.GetFileName(url1.LocalPath);
+            try
+            {
+                url1 = new Uri(URL.Text);
+                fileName = Locat.Text + System.IO.Path.GetFileName(url1.LocalPath);
+            }
+            catch
+            {
+                abc.Text = "ERROR";
+                Window1 win2 = new Window1();
+                win2.ShowDialog();
+                Environment.Exit(0);
+            }
 			_source = URL.Text;
 			_destination = fileName;
             percl = GetContentLength();
@@ -70,7 +81,20 @@ namespace WpfApplication1
             }
             else
             {
-                abc.Text = "File already exists";
+                Window1 Win = new Window1();
+                Win.ShowDialog();
+                
+                  if (Win.check == 1)
+                   {
+                        abc.Text = "File to be overwritten";
+                        File.Delete(_destination);
+                        Start();
+                    }
+                    else
+                    {
+                        abc.Text = "Operation Aborted";
+                    }
+                
             }
             if (Done)
             {
@@ -81,7 +105,6 @@ namespace WpfApplication1
         private void canc(object sender, RoutedEventArgs e)
         {
             Stop();
-            //client1.CancelAsync();
         }
 		
 		public long GetContentLength()
@@ -135,6 +158,7 @@ namespace WpfApplication1
                             }
                         }
                         
+                        
                         await fs.FlushAsync();
                     }
                 }
@@ -145,6 +169,8 @@ namespace WpfApplication1
             }
             else if (!_notstop)
             {
+                abc.Text = "Download inomplete. Deleting File.";
+
                 File.Delete(_destination);
                 _notstop = true;
 
@@ -154,6 +180,14 @@ namespace WpfApplication1
 		public void Stop()
         {
             _notstop = false;
+            URL.Text = "Enter URL Here";
+            progbar.Value = 0;
+            abc.Text = "";
+            tb2.Text = "";
+            BytesWritten = 0;
+            _source = "";
+            _allowedToRun = true;
+            
         }
         private Task Start()
         {
