@@ -2,22 +2,69 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DuneLoad" Height="247.358" Width="647.737" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Cursor="Arrow" Background="White" BorderThickness="2">
-    <Grid x:Name="Pause" Margin="0,0,2,3">
+        Title="DuneLoad" Height="369.358" Width="640.737" WindowStartupLocation="CenterScreen" Cursor="Arrow" Background="White" BorderThickness="0" ResizeMode="CanMinimize" ShowIconOnTitleBar="False">
+    <Controls:MetroWindow.Effect>
+        <DropShadowEffect/>
+    </Controls:MetroWindow.Effect>
+    <Controls:MetroWindow.WindowCommands>
+        <Controls:WindowCommands>
+            <Button x:Name="about_button" Content="ABOUT" Click="about_button_Click_1"/>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.WindowCommands>
+    <Grid x:Name="Pause" Margin="0,0,2,5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="31"/>
             <ColumnDefinition Width="170"/>
-            <ColumnDefinition Width="436"/>
+            <ColumnDefinition Width="145"/>
+            <ColumnDefinition Width="258"/>
+            <ColumnDefinition Width="34"/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="addurl" Content="Download" Margin="295,18,0,0" VerticalAlignment="Top" Click="onclick" Grid.Column="2" Height="56" HorizontalAlignment="Left" Width="131" FontFamily="Helvetica Neue" FontSize="12" FontWeight="Normal"/>
-        <Button Content="PAUSE" HorizontalAlignment="Left" Margin="12,126,0,0" VerticalAlignment="Top" Width="75" Height="25" FontFamily="Helvetica Neue" FontSize="12" FontWeight="Normal" Grid.Column="1" Click="Pause2"/>
-        <Button x:Name="stop" Content="STOP" HorizontalAlignment="Left" Margin="321,126,0,0" VerticalAlignment="Top" Width="75" Grid.Column="2" Height="25" Click="canc" FontFamily="Helvetica Neue" FontSize="12" FontWeight="Normal"/>
-        <TextBox x:Name="URL" Height="26" Margin="72,17,149,0" TextWrapping="Wrap" VerticalAlignment="Top" ToolTip="Paste URL for required download here." TextOptions.TextFormattingMode="Display" Grid.ColumnSpan="2" Text="Enter URL here" FontFamily="Helvetica Neue" Grid.Column="1"/>
-        <TextBox x:Name="Locat" Height="26" Margin="72,48,149,0" TextWrapping="Wrap" Text="D:\temp\" VerticalAlignment="Top" Grid.ColumnSpan="2" FontFamily="Helvetica Neue" Grid.Column="1"/>
-        <Label Content="Save Location" Margin="10,48,96,0" VerticalAlignment="Top" FontFamily="Helvetica Neue" Height="24" Grid.ColumnSpan="2"/>
-        <Label Content="URL" Margin="10,18,96,0" VerticalAlignment="Top" RenderTransformOrigin="0.718,0.176" Height="25" FontFamily="Helvetica Neue" Grid.ColumnSpan="2"/>
-        <TextBlock x:Name="abc" HorizontalAlignment="Left" Margin="111,127,0,0" TextWrapping="Wrap" Width="358" TextAlignment="Center" FontFamily="Helvetica Neue" FontSize="14" Grid.ColumnSpan="2" Height="25" VerticalAlignment="Top" Grid.Column="1"/>
-        <ProgressBar x:Name="progbar" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" Width="557" Grid.ColumnSpan="3" Height="26" Background="#FFB9B9B9" Foreground="#FF14CBF3"/>
-        <TextBlock x:Name="tb2" Grid.Column="2" HorizontalAlignment="Left" Margin="371,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="22" Width="55" RenderTransformOrigin="0.5,0.462" FontSize="16" IsEnabled="False" FontFamily="Helvetica Neue" TextAlignment="Center"/>
+        <TabControl HorizontalAlignment="Left" Height="190" Margin="10,10,0,0" VerticalAlignment="Top" Width="613" Grid.ColumnSpan="5" BorderThickness="5,1,1,1">
+            <TabItem Header="file download">
+                <Grid Margin="0,7">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="131*"/>
+                        <ColumnDefinition Width="476*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="addurl" Content="Download" Margin="0,79,0,0" VerticalAlignment="Top" Click="onclick" Height="46" FontFamily="Helvetica CE 35 Thin" FontSize="24" FontWeight="Normal"  Style="{DynamicResource SquareButtonStyle}" Grid.ColumnSpan="2"/>
+                    <TextBox x:Name="URL" Height="25" Margin="120,18,0,0" TextWrapping="Wrap" VerticalAlignment="Top" ToolTip="Paste URL for required download here." TextOptions.TextFormattingMode="Display" FontFamily="Helvetica CE 35 Thin" FontSize="14" Controls:TextboxHelper.ClearTextButton="True" Controls:TextboxHelper.Watermark="Enter URL here" Grid.ColumnSpan="2"/>
+                    <Label Content="URL" Margin="2,19,36,0" VerticalAlignment="Top" RenderTransformOrigin="0.718,0.176" Height="24" FontFamily="Helvetica CE 35 Thin" FontSize="14"/>
+                    <ProgressBar x:Name="id_prog" HorizontalAlignment="Left" Margin="0,64,0,0" VerticalAlignment="Top" Width="342" Height="10" Grid.Column="1" IsIndeterminate="True" Visibility="Hidden"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="youtube video download" BorderThickness="0">
+                <Grid Margin="0,7">
+                    <TextBox x:Name="youtlink" HorizontalAlignment="Left" Height="26" Margin="120,18,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="487" Controls:TextboxHelper.Watermark="Enter YouTube URL here" Controls:TextboxHelper.ClearTextButton="True" FontFamily="Helvetica CE 35 Thin" FontSize="14"/>
+                    <Button x:Name="yout_button" Content="Download" Margin="0,79,0,0" VerticalAlignment="Top" Click="yout_button_Click" Height="46" FontFamily="Helvetica CE 35 Thin" FontSize="24" FontWeight="Normal" Style="{DynamicResource SquareButtonStyle}" Grid.ColumnSpan="2"/>
+                    <Label Content="URL" Margin="2,19,512,0" VerticalAlignment="Top" RenderTransformOrigin="0.718,0.176" Height="24" FontFamily="Helvetica CE 35 Thin" FontSize="14"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tab3" Margin="257,0,-282,24" >
+                <Grid Margin="0,7,0,0">
+                    <TextBlock HorizontalAlignment="Left" Height="116" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="587" FontFamily="Helvetica CE 35 Thin" FontSize="20" TextAlignment="Center"><Run Text="This lightweight downloader was made out of curiosity as my first personal project. "/><Run Text="I hope you all like it."/><LineBreak/><Run Text="- Arjun"/><LineBreak/><Run Text="twitter.com/_arjunajith_"/></TextBlock>
+                </Grid>
+            </TabItem>
+            <!--<TabItem Header="Current Values">
+                <Grid Margin="0,5,0,9">
+                    <TextBox x:Name="tex1" HorizontalAlignment="Left" Height="22" Margin="148,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                    <TextBox x:Name="tex3" HorizontalAlignment="Left" Height="23" Margin="148,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                    <TextBox x:Name="tex5" HorizontalAlignment="Left" Height="23" Margin="148,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                    <TextBox x:Name="tex2" HorizontalAlignment="Left" Height="23" Margin="348,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                    <TextBox x:Name="tex4" HorizontalAlignment="Left" Height="23" Margin="348,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+                    <TextBox x:Name="tex6" HorizontalAlignment="Left" Height="23" Margin="348,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                </Grid>
+            </TabItem>-->
+        </TabControl>
+        <ProgressBar x:Name="progbar" HorizontalAlignment="Left" Margin="114,208,0,0" VerticalAlignment="Top" Width="347" Height="44" Background="#FFB9B9B9" Foreground="#FF14CBF3" Grid.ColumnSpan="3" Grid.Column="1"/>
+        <Button x:Name="stop" Content="STOP" Margin="153,207,16,0" VerticalAlignment="Top" Height="44" Click="canc" FontFamily="Helvetica CE 35 Thin" FontSize="24" FontWeight="Normal"  Style="{DynamicResource SquareButtonStyle}" Grid.ColumnSpan="2" Grid.Column="3"/>
+        <Button Content="" HorizontalAlignment="Left" Margin="15,207,0,0" VerticalAlignment="Top" Width="124" Height="44" FontFamily="Helvetica CE 35 Thin" FontSize="24" FontWeight="Normal" Click="Pause2"  Style="{DynamicResource SquareButtonStyle}" Grid.ColumnSpan="2" />
+        <TextBlock x:Name="pbuttontext" HorizontalAlignment="Left" Height="27" Margin="15,215,0,0" TextWrapping="Wrap" Text="pause" VerticalAlignment="Top" Width="124" FontSize="24" FontFamily="Helvetica CE 35 Thin" TextAlignment="Center" IsEnabled="False" IsHitTestVisible="False" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="Locat" Height="26" Margin="104,305,112,0" TextWrapping="Wrap" Text="D:\temp\" VerticalAlignment="Top" FontFamily="Helvetica CE 35 Thin" FontSize="14" Controls:TextboxHelper.Watermark="Location" Grid.ColumnSpan="3" Grid.Column="1"/>
+        <Label Content="Save Location" Margin="17,305,71,0" VerticalAlignment="Top" FontFamily="Helvetica CE 35 Thin" Height="24" FontSize="14" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="tb2" HorizontalAlignment="Left" Margin="152,256,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="43" Width="124" RenderTransformOrigin="0.5,0.462" FontSize="16" IsEnabled="False" FontFamily="Helvetica Neue" TextAlignment="Center" Grid.Column="3" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="abc" HorizontalAlignment="Left" Margin="114,256,0,0" TextWrapping="Wrap" Width="347" TextAlignment="Center" FontFamily="Helvetica Neue" FontSize="14" Height="44" VerticalAlignment="Top" Grid.ColumnSpan="3" Grid.Column="1"/>
+        <TextBox x:Name="tb3" HorizontalAlignment="Left" Height="43" Margin="17,256,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="113" Grid.ColumnSpan="2"/>
+        <Button x:Name="folderPath" Content="path" Grid.Column="3" HorizontalAlignment="Left" Margin="153,305,0,0" VerticalAlignment="Top" Width="124" Grid.ColumnSpan="2" Height="26" Style="{DynamicResource SquareButtonStyle}" FontFamily="Helvetica CE 35 Thin" FontSize="14" Click="Browse_Click"/>
+        <Border BorderBrush="Black" BorderThickness="1" Grid.Column="2" HorizontalAlignment="Left" Height="8" Margin="121,-122,0,0" VerticalAlignment="Top" Width="0"/>
     </Grid>
 </Controls:MetroWindow>

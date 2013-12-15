@@ -17,14 +17,10 @@ using System.Net;
 using System.ComponentModel;
 using System.IO;
 using Duneload;
-
+using YoutubeExtractor;
 
 namespace WpfApplication1
 {
-
-
-		
-
     public partial class MainWindow
     {
         private bool _allowedToRun;
@@ -37,14 +33,19 @@ namespace WpfApplication1
         public int ContentLength { get { return _contentLength.Value; } }
         public bool Done { get { return ContentLength == BytesWritten; } }
         private bool pausecheck;
-        public double percl,perc;
+        public double percl, perc;
         Uri url1;
         string fileName;
+        private bool startd;
+        public bool errorstays;
+        public int qual;
 
         public MainWindow()
         {
+
             InitializeComponent();
-			_allowedToRun = true;
+            pbuttontext.Text = "pause";
+            _allowedToRun = true;
             _notstop = true;
             _source = "";
             _destination = "";
@@ -54,12 +55,29 @@ namespace WpfApplication1
             pausecheck = false;
             percl = 0;
             perc = 0;
-            
+            startd = false;
+            qual = 360;
         }
 
         private void onclick(object sender, RoutedEventArgs e)
         {
             abc.Text = "";
+            _notstop = true;
+            pausecheck = false;
+
+            ////DEBUG
+
+            //if (_allowedToRun) tex1.Text = "true";
+            //else tex1.Text = "false";
+            //if (_notstop) tex2.Text = "true";
+            //else tex2.Text = "false";
+            //if (pausecheck) tex3.Text = "true";
+            //else tex3.Text = "false";
+            //tex4.Text = BytesWritten.ToString();
+
+
+            ////END DEBUG
+
             try
             {
                 url1 = new Uri(URL.Text);
@@ -67,13 +85,12 @@ namespace WpfApplication1
             }
             catch
             {
-                abc.Text = "ERROR";
-                Window1 win2 = new Window1();
+                Error1 win2 = new Error1();
                 win2.ShowDialog();
-                Environment.Exit(0);
+                return;
             }
-			_source = URL.Text;
-			_destination = fileName;
+            _source = URL.Text;
+            _destination = fileName;
             percl = GetContentLength();
             if (!File.Exists(_destination))
             {
@@ -83,39 +100,41 @@ namespace WpfApplication1
             {
                 Window1 Win = new Window1();
                 Win.ShowDialog();
-                
-                  if (Win.check == 1)
-                   {
-                        abc.Text = "File to be overwritten";
-                        File.Delete(_destination);
-                        Start();
-                    }
-                    else
-                    {
-                        abc.Text = "Operation Aborted";
-                    }
-                
+
+                if (Win.check == 1)
+                {
+                    abc.Text = "File to be overwritten";
+                    File.Delete(_destination);
+                    Start();
+                    abc.Text = "Done" + GetContentLength().ToString();
+
+                }
+                else
+                {
+                    abc.Text = "Operation Aborted";
+                }
+
             }
-            if (Done)
-            {
-                abc.Text = "Download Complete";
-            }
+            abc.Text = "Done" + GetContentLength().ToString();
+            //{
+            //    abc.Text = "Download Complete";
+            //}
         }
-		
+
         private void canc(object sender, RoutedEventArgs e)
         {
             Stop();
         }
-		
-		public long GetContentLength()
+
+        public long GetContentLength()
         {
             var request = (HttpWebRequest)WebRequest.Create(_source);
             request.Method = "HEAD";
             using (var response = request.GetResponse())
                 return response.ContentLength;
         }
-		
-		private async Task Start(int range)
+
+        private async Task Start(int range)
         {
             if (!_allowedToRun)
                 throw new InvalidOperationException();
@@ -138,27 +157,40 @@ namespace WpfApplication1
                             BytesWritten += bytesRead;
                             if (!pausecheck)
                             {
-                                abc.Text = BytesWritten.ToString();
-                                perc = (BytesWritten/percl) * 100;
-                                tb2.Text = perc.ToString().Substring(0,4) + " %";
-                                progbar.Value = perc;
+                                if (BytesWritten < percl)
+                                {
+                                    float inMB = BytesWritten;
+                                    inMB = inMB / 1048576;
+                                    double totinMB = percl;
+                                    totinMB = totinMB / 1048576;
+                                    abc.Text = inMB.ToString("#,##0.00") + " MB of " + totinMB.ToString("#,##0.00") +" MB";
+                                    perc = (BytesWritten / percl) * 100;
+                                    tb2.Text = perc.ToString().Substring(0, 4) + " %";
+                                    progbar.Value = perc;
+                                }
+                                else
+                                {
+                                    perc = 0;
+                                    tb2.Text = "100%";
+                                    progbar.Value = 0;
+                                }
                             }
                             if (!_notstop)
                             {
-                                URL.Text = "Enter URL Here";
+                                URL.Text = "";
                                 progbar.Value = 0;
                                 abc.Text = "";
                                 tb2.Text = "";
                                 BytesWritten = 0;
+                                pbuttontext.Text = "pause";
                                 _notstop = true;
                                 _source = "";
                                 _allowedToRun = true;
                                 fs.Close();
                                 break;
                             }
+
                         }
-                        
-                        
                         await fs.FlushAsync();
                     }
                 }
@@ -167,55 +199,152 @@ namespace WpfApplication1
             {
                 abc.Text = "Download Complete";
             }
-            else if (!_notstop)
-            {
-                abc.Text = "Download inomplete. Deleting File.";
-
-                File.Delete(_destination);
-                _notstop = true;
-
-            }
         }
-		
-		public void Stop()
+
+        public void Stop()
         {
+            startd = false;
             _notstop = false;
-            URL.Text = "Enter URL Here";
+            URL.Text = "";
+            pbuttontext.Text = "pause";
             progbar.Value = 0;
             abc.Text = "";
             tb2.Text = "";
             BytesWritten = 0;
             _source = "";
             _allowedToRun = true;
-            
+
         }
         private Task Start()
         {
+            startd = true;
             _allowedToRun = true;
             return Start(BytesWritten);
         }
         public void Pause1()
         {
-            _allowedToRun = false;
+            if (startd)
+            {
+                _allowedToRun = false;
+                pbuttontext.Text = "resume";
+            }
+            else
+            {
+                abc.Text = "No Active Downlaod";
+            }
         }
 
         private void Pause2(object sender, RoutedEventArgs e)
         {
-            if (!pausecheck)
+            if (!pausecheck && startd)
             {
                 Pause1();
                 pausecheck = true;
                 abc.Text = "Download Paused";
             }
-            else
+            else if (pausecheck && startd)
             {
                 Start();
                 pausecheck = false;
+                pbuttontext.Text = "pause";
                 abc.Text = "Resuming";
+            }
+            else if (!startd)
+            {
+                abc.Text = "No Active Download";
+            }
+        }
+
+        private void yout_button_Click(object sender, RoutedEventArgs e)
+        {
+
+            _notstop = true;
+            pausecheck = false;
+            videoget();  
+        }
+
+        private void videoget()
+        {
+            string link;
+            IEnumerable<VideoInfo> videoInfos;
+            try
+            {
+                link = youtlink.Text;
+                videoInfos = DownloadUrlResolver.GetDownloadUrls(link);
+            }
+            catch
+            {
+                Error1 e1 = new Error1();
+                e1.ShowDialog();
+                return;
+            }
+            quality q1 = new quality();
+            id_prog.Visibility = System.Windows.Visibility.Visible;
+            q1.ShowDialog();
+            qual = q1.quali;
+
+            VideoInfo video;// = videoInfos.First(info => info.VideoType == VideoType.Mp4 && info.Resolution == 360);
+            try
+            {
+                video = videoInfos.First(info => info.VideoType == VideoType.Mp4 && info.Resolution == qual);
+            }
+            catch
+            {
+                tb3.Text = "Unavailable";
+                video = videoInfos.First(info => info.VideoType == VideoType.Mp4 && info.Resolution == 360);
+            }
+            id_prog.Visibility = System.Windows.Visibility.Hidden;
+            tb3.Text = video.Resolution.ToString();
+            fileName = Locat.Text + video.Title + ".mp4"; //System.IO.Path.GetFileName(url1.LocalPath);
+            _source = video.DownloadUrl;
+            _destination = fileName;
+            percl = GetContentLength();
+            if (!File.Exists(_destination))
+            {
+                Start();
+            }
+            else
+            {
+                Window1 Win = new Window1();
+                Win.ShowDialog();
+
+                if (Win.check == 1)
+                {
+                    abc.Text = "File to be overwritten";
+                    File.Delete(_destination);
+                    Start();
+                    abc.Text = "Done ";
+
+                }
+                else
+                {
+                    abc.Text = "Operation Aborted";
+                }
 
             }
         }
 
+        private void about_button_Click_1(object sender, RoutedEventArgs e)
+        {
+            tab3.Focus();
+        }
+
+        private void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                Locat.Text = dialog.SelectedPath + "\\";
+            }
+        }
+        //var videoDownloader = new VideoDownloader(video, System.IO.Path.Combine("D:/Downloads", video.Title + video.VideoExtension));
+        //videoDownloader.DownloadProgressChanged += (sender3, args) =>
+        //    {
+        //      yout_progbar.Value = args.ProgressPercentage;
+        //   };
+        //videoDownloader.Execute();
 
     }
+    
 }

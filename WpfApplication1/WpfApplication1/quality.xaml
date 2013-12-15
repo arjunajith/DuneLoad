@@ -1,0 +1,14 @@
+﻿<Controls:MetroWindow x:Class="Duneload.quality"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="quality" Height="234.586" Width="283.083" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
+    <Grid Margin="0,0,2,-1">
+        <RadioButton x:Name="q480" Content="480p" HorizontalAlignment="Left" Margin="34,70,0,0" VerticalAlignment="Top" Height="24" Width="67" FontFamily="Helvetica CE 35 Thin" FontSize="14" Checked="q480_Checked"/>
+        <RadioButton x:Name="q720" Content="720p" HorizontalAlignment="Left" Margin="34,115,0,0" VerticalAlignment="Top" Height="25" Width="67" FontFamily="Helvetica CE 35 Thin" FontSize="14" Checked="q720_Checked"/>
+        <RadioButton x:Name="q1080" Content="1080p" HorizontalAlignment="Left" Margin="34,160,0,0" VerticalAlignment="Top" Height="23" Width="76" FontFamily="Helvetica CE 35 Thin" FontSize="14" Checked="q1080_Checked"/>
+        <RadioButton x:Name="q360" Content="360p" HorizontalAlignment="Left" Margin="34,25,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,0.474" Height="23" Width="67" FontFamily="Helvetica CE 35 Thin" FontSize="14" Checked="q360_Checked"/>
+        <Button x:Name="q_button" Content="OK" HorizontalAlignment="Left" Margin="143,58,0,0" VerticalAlignment="Top" Width="95" Style="{DynamicResource MetroCircleButtonStyle}" Height="95" FontFamily="Helvetica CE 35 Thin" FontSize="22" Foreground="#FF007ACC" Click="q_button_Click" ToolTip="Select A Video Quality"/>
+
+    </Grid>
+</Controls:MetroWindow>
